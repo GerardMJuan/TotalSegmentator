@@ -739,8 +739,12 @@ def nnUNet_predict_image(file_in: Union[str, Path, Nifti1Image], file_out, task_
                 # file_out.mkdir(exist_ok=True, parents=True)
                 save_mask_as_rtstruct(img_data, selected_classes, file_in_dcm, file_out)
             elif output_type == "dicom_seg":
+                # save as nifti first, in file_out removing the dicom extension and adding .nii.gz
+                nifti_file_out = file_out.with_suffix(".nii.gz")
+                nib.save(img_out, nifti_file_out)
+
                 # file_out.mkdir(exist_ok=True, parents=True)
-                save_mask_as_dicomseg(img_data, selected_classes, file_in_dcm, file_out, img_out.affine)
+                save_mask_as_dicomseg(nifti_file_out, selected_classes, file_in_dcm, file_out)
             else:
                 st = time.time()
                 if multilabel_image:
